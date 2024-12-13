@@ -1,0 +1,97 @@
+#include <iostream>
+#include <string>
+#include <map>
+#include <vector>
+using namespace std;
+
+// Struktur untuk menyimpan informasi tanaman
+struct Tanaman {
+    float suhuMin, suhuMax;
+    float curahHujanMin, curahHujanMax;
+    float kelembapanMin, kelembapanMax;
+    int durasiCahayaMin, durasiCahayaMax;
+    string kondisiCuaca;
+};
+
+// Fungsi untuk mengecek kondisi tanaman
+void cekKondisiTanaman(map<string, Tanaman> databaseTanaman, string jenisTanaman, string cuaca, float suhu, float curahHujan, float kelembapan, int durasiCahaya) {
+    if (databaseTanaman.find(jenisTanaman) == databaseTanaman.end()) {
+        cout << "Jenis tanaman tidak ditemukan dalam database." << endl;
+        return; // Keluar dari fungsi jika tanaman tidak ada di database
+    }
+
+    Tanaman t = databaseTanaman[jenisTanaman];
+
+    cout << "\nHasil prediksi untuk tanaman: " << jenisTanaman << endl;
+
+    if (cuaca == t.kondisiCuaca &&
+        suhu >= t.suhuMin && suhu <= t.suhuMax &&
+        curahHujan >= t.curahHujanMin && curahHujan <= t.curahHujanMax &&
+        kelembapan >= t.kelembapanMin && kelembapan <= t.kelembapanMax &&
+        durasiCahaya >= t.durasiCahayaMin && durasiCahaya <=t.durasiCahayaMax) {
+        cout << "Prediksi hasil tanaman sangat baik." << endl;
+    } else {
+        cout << "Prediksi hasil tanaman buruk. Periksa kondisi berikut:" << endl;
+        if (cuaca != t.kondisiCuaca) cout << "- Cuaca tidak sesuai (dibutuhkan: " << t.kondisiCuaca << ")" << endl;
+        if (suhu < t.suhuMin || suhu > t.suhuMax) cout << "- Suhu tidak sesuai (dibutuhkan: " << t.suhuMin << " - " << t.suhuMax << " derajat Celcius)" << endl;
+        if (curahHujan < t.curahHujanMin || curahHujan > t.curahHujanMax) cout << "- Curah hujan tidak sesuai (dibutuhkan: " << t.curahHujanMin << " - " << t.curahHujanMax << " mm)" << endl;
+        if (kelembapan < t.kelembapanMin || kelembapan > t.kelembapanMax) cout << "- Kelembapan tidak sesuai (dibutuhkan: " << t.kelembapanMin << " - " << t.kelembapanMax << "%)" << endl;
+        if (durasiCahaya < t.durasiCahayaMin || durasiCahaya >t.durasiCahayaMax) cout << "- Durasi cahaya tidak sesuai (dibutuhkan: minimal " << t.durasiCahayaMin << " -"<<t.durasiCahayaMax << " jam)" << endl;
+    }
+}
+
+// Fungsi untuk memberikan saran tindakan
+void printSaranTindakan(float suhu, float curahHujan, float kelembapan) {
+    cout << "Saran Tindakan: ";
+    if (curahHujan < 50) {
+        cout << "Disarankan untuk menambah irigasi pada tanaman." << endl;
+    }
+    if (kelembapan < 60) {
+        cout << "Pastikan kelembapan udara cukup untuk tanaman, pertimbangkan penggunaan sistem penyiraman." << endl;
+    }
+    if (suhu > 35) {
+        cout << "Suhu terlalu tinggi untuk beberapa tanaman, pertimbangkan penanaman pada waktu yang lebih dingin." << endl;
+    }
+}
+
+// Fungsi utama
+int main() {
+    // Database tanaman
+    map<string, Tanaman> databaseTanaman;
+    databaseTanaman["padi"] = {22, 28, 1500, 2000, 33, 90, 10, 12, "hujan"};
+    databaseTanaman["cabai"] = {24, 28, 800, 2000, 60, 80, 6, 8, "cerah"};
+    databaseTanaman["tomat"] = {24, 28, 750, 1250, 60, 80, 10, 12, "cerah"};
+    databaseTanaman["timun"]= {20, 32, 200, 400, 50, 85, 8, 12, "cerah"};
+    databaseTanaman["melon"]= {25, 30, 1500, 2500, 70, 80, 10, 12, "cerah"};
+    databaseTanaman["bawangmerah"]= {23, 32, 300, 2500, 50, 90, 11, 16, "cerah"};
+    databaseTanaman["jagung"]= {23,27,1000,2500, 80, 90, 6, 8, "cerah"};
+
+    // Input
+    string cuaca, jenisTanaman;
+    float suhu, curahHujan, kelembapan;
+    int durasiCahaya;
+
+    cout << "Masukkan kondisi cuaca (cerah/berawan/hujan): ";
+    cin >> cuaca;
+    cout << "Masukkan suhu (dalam derajat Celcius): ";
+    cin >> suhu;
+    cout << "Masukkan curah hujan (dalam mm): ";
+    cin >> curahHujan;
+    cout << "Masukkan kelembapan (%): ";
+    cin >> kelembapan;
+    cout << "Masukkan durasi cahaya matahari (jam): ";
+    cin >> durasiCahaya;
+    cout << "Masukkan jenis tanaman: ";
+    cin >> jenisTanaman;
+
+    // Cek kondisi tanaman
+    cekKondisiTanaman(databaseTanaman, jenisTanaman, cuaca, suhu, curahHujan, kelembapan, durasiCahaya);
+
+    // Saran tindakan hanya ditampilkan jika jenis tanaman valid
+    if (databaseTanaman.find(jenisTanaman) != databaseTanaman.end()) {
+        printSaranTindakan(suhu, curahHujan, kelembapan);
+    }
+
+    return 0;
+}
+
